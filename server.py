@@ -20,7 +20,7 @@ class Application(tornado.web.Application):
             url(r'/auth/logout/', AuthLogoutHandler),
 	    url(r'/home/', HomePageHandler, name='home'),
             url(r'/account/', AccountPageHandler, name = 'account'),
-            url(r'/learn/', ProjectPageHandler, name = 'learn'),
+            url(r'/learn/', LearnPageHandler, name = 'learn'),
             url(r'/definitions/', DefPageHandler, name = 'definitions')
 	]
 	
