@@ -1,6 +1,8 @@
 import tornado.httpserver
 import tornado.ioloop
 import tornado.options
+import pymongo
+import collections
 import tornado.web
 from operator import itemgetter
 from tornado.options import define, options
@@ -18,6 +20,7 @@ class Application(tornado.web.Application):
         handlers = [
             url(r'/auth/login/',AuthLoginHandler),
             url(r'/auth/logout/', AuthLogoutHandler),
+            url(r'/register/', RegisterHandler),
 	    url(r'/home/', HomePageHandler, name='home')
 	]
 	
@@ -26,8 +29,12 @@ class Application(tornado.web.Application):
             "static_path":Settings.STATIC_PATH,
             "debug":Settings.DEBUG,
             "cookie_secret": Settings.COOKIE_SECRET,
+            'xsrf_cookies': False,
             "login_url": "/auth/login/"
         }
+        conn = pymongo.MongoClient("localhost", 27017)
+        self.db = conn["jjaguar_database"]
+        coll = self.db['auth_users']        
         tornado.web.Application.__init__(self, handlers, **settings)
                 
 if __name__ == "__main__":
