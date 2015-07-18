@@ -82,4 +82,26 @@ class AuthLogoutHandler(BaseHandler):
         
 class HomePageHandler(BaseHandler):
     def get(self):   
-        self.render("home.html")
+        self.render('sidebar.html')
+
+class AccountPageHandler(BaseHandler):
+    def get(self):
+        languages = ['python', 'java', 'javascript', 'c']	
+	self.render('account.html', languages = languages)
+
+class LearnPageHandler(BaseHandler):
+    def get(self):
+	self.write('learn page handler')
+    
+
+class DefPageHandler(BaseHandler):
+    def get(self):
+	form = """<h3>Here are a few terms to understand before we recommend a dictionary:</h3>
+		<p>Imperative - focuses on describing how a program operates, defines sequences of commands for the computer to perform</p>
+		<p>Declarative - describes what the program should accomplish, rather than describing how to go about accomplishing it as a sequence of the commands </p>
+		<p>Static Typing - the type of a variable is known at compile time, the user must declare the type of each variable</p>
+		<p>Dynamic Typing - allows you to provide type information, but do not require it</p>
+		<p>Compiled language - </p>
+		<p>Interpreted language- most of its implementations execute instructions directly, without previously compiling a program into machine-language instructions</p>
+		<p>Functional - functions, not objects or procedures, are used as the fundamental building blocks of a program</p></h3>"""
+	self.write(form)
