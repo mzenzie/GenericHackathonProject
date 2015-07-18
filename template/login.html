@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Resource Manager Login </title>
+</head>
+
+<body>
+    <hr/>
+    <h1> You must login in order to manage reservations. </h1> <hr/>
+    <form action = "/auth/login/" method = "post" id = "login_form">
+        <fieldset>
+            <label for = "username">Username </label>
+            <input class = "text-input" id = "username" placeholder = "Enter in your username" name = "username" type = "text" value = ""  required>
+        </fieldset>
+        
+        <fieldset>
+            <label for = "password">Password </label>
+            <input class = "text-input" id = "password" name = "password" type = "password" placeholder = "Enter in your password" value = "" required>
+        </fieldset>
+        
+        <div id = "form_btn">
+            <p></p>
+            <input id = "signin-btn" class = "btn btn-blue" type = "submit" value = "Sign In" tabindex = "3">
+        <div>
+    </form>
+    
+</body>
+</html>
