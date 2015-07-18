@@ -1,10 +1,9 @@
-core_languages = [dict(name="java", imperative="y", typing="s", compiled="y", functional="n"),
-                  dict(name="python", imperative="y", typing="d", compiled="n", functional="n"),
-                  dict(name="c", imperative="y", typing="s", compiled="y", functional="n"),
-                  dict(name="c++", imperative="y", typing="s", compiled="y", functional="n"),
-                  dict(name="c#", imperative="y", typing="s", compiled="n", functional="n"),
-                  dict(name="javascript", imperative="y", typing="d", functional="n"),
-                  dict(name="clojure", imperative="y", typing="d", compiled="y", functional="y")]
-
-def add_lanague (languages, new_lang):
-    languages.append(new_lang)
+core_languages = [dict(name="java", imperative="y", typing="s", compiled="y", functional="n", description="An object oriented language common in enterprise and android development. Has an in-depth type system with inheritance and polymorphism."),
+                  dict(name="python", imperative="y", typing="d", compiled="n", functional="n", description="An easy to use scripting language with a number of useful features for producing succinct and powerful code. Has tools for both functional and object-oriented."),
+                  dict(name="c", imperative="y", typing="s", compiled="y", functional="n", description="A relatively low-level language with many applications in embedded devices and performance-reliant software."),
+                  dict(name="c++", imperative="y", typing="s", compiled="y", functional="n", description="An expanded version of C with a more complex type system, akin to Java's. Often used in enterprise systems and video games."),
+                  dict(name="c#", imperative="y", typing="s", compiled="n", functional="n", description="A jack-of-all-trades scripting language combining the utility of python with the object-orientedness of java."),
+                  dict(name="javascript", imperative="y", typing="d", compiled="n", functional="n", description="A scripting language used for adding real-time components to web-pages, such as animation and active html modification. Also used with nodeJS to program web-servers."),
+                  dict(name="haskell", imperative="n", typing="s", compiled="y", functional="y", description="A functional language known for its extensive usage of lazy evaluation"),
+                  dict(name="clojure", imperative="n", typing="d", compiled="y", functional="y", description="A modern dialect of lisp running on the java virtual machine."),
+                  dict(name="smalltalk", imperative="n", typing="d", compiled="y", functional="n", description="An object-oriented programming language that stores program state in an "image" on the hard disk.")]
