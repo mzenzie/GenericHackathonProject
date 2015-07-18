@@ -16,7 +16,11 @@ class Application(tornado.web.Application):
             (r"/", MainPageHandler),
             (r"/auth/login/",AuthLoginHandler),
             (r"/home/", HomePageHandler),
-            (r"/auth/logout/", AuthLogoutHandler)]
+            (r"/auth/logout/", AuthLogoutHandler),
+	    
+	    url(r'/', HomeHandler, name='home')
+	]
+	
         settings = {
             "template_path":Settings.TEMPLATE_PATH,
             "static_path":Settings.STATIC_PATH,
@@ -96,6 +100,9 @@ class HomePageHandler(BaseHandler):
     @protected
     def get(self):   
         self.write("Welcome to the home page")
+	render_sidebar(self)
+
+
                 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
