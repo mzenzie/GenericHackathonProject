@@ -1,1 +1,1 @@
-mongod --dbpath ./jjaguar.db
+mongod --dbpath ./db --port 12321
