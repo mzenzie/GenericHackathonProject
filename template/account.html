@@ -18,7 +18,7 @@
 		}
 		else {
 		    var newdiv = document.createElement('div');
-		    newdiv.innerHTML =  "<input type='text' name='myInputs" + counter + "'>";
+		    newdiv.innerHTML =  "<input type='text' name='bad_lang" + counter + "'>";
 		    document.getElementById(divName).appendChild(newdiv);
 		    counter++;
 		}
@@ -129,8 +129,9 @@
 				var val
 				$("ul").on("click", "button", function(e) {
 				    e.preventDefault();
+				    prev_val = document.getElementById('hiding').innerHTML
 				    val = $(this).parent()
-				    document.getElementById('hiding').innerHTML = this.value;
+				    document.getElementById('hiding').innerHTML = prev_val + ' ' + this.value;
 				    $(this).parent().remove();
 				});
 				
@@ -147,7 +148,7 @@
 			<p>Add any languages that you do no have interest in:</p>
 			<form method="POST" class="input" action="/account/">
 			    <div id="dynamicInput">
-				<input type="text" name="myInputs0" required>
+				<input type="text" name="bad_lang0" required>
 			    </div>
 			    <input class = 'submit' type="submit" value="Submit">
 
