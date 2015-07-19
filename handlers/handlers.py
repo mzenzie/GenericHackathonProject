@@ -115,6 +115,7 @@ class AccountPageHandler(BaseHandler):
 	    exceptions = user_doc.get('exceptions')
 	    skills = user_doc.get('skills')
 	    new = False
+	    
 	else:
 	    user_doc = {
 	        'name': user,
@@ -136,30 +137,47 @@ class AccountPageHandler(BaseHandler):
 	for w in sorted(old_recs, key=old_recs.get, reverse=True):
 	    recs.append([w, old_recs[w]])
 	
-	self.render('account.html', languages = new_langs, exceptions = exceptions, old_recs = recs, user = user, new = new, skills = skills)
-
+	self.render('account.html', languages = new_langs, exceptions = exceptions, old_recs = recs, user = user, new = new)
+	
     def post(self):
 	conn = pymongo.MongoClient()
 	db = conn['jjaguar_database']
 	coll = db['account_info']
 	user = self.get_current_user()	
 	
-	print 'here'
-    
 	languages = []
-	for each in descriptions.evaluated_languages:
-	    languages.append(each)
 	
-	ratings = {}
-	for i in range(0, len(languages)):
-	    try:
-		print self.get_argument('rate-' + str(i)), 'hi'
-	    except:
-		print 'no rates'
-		break
-	    	
+	skills = {}
+	for each in descriptions.evaluated_languages:
+	    skills[each] = 1
+	    languages.append(each)
+	    
+	new_langs = []
+	for each in skills:
+	    new_langs.append([each, skills[each]])    
 
-	exceptions = []
+	user_doc = coll.find_one({'name': user})
+	exceptions = user_doc['exceptions']
+	word = self.get_argument('hiding').split()
+	for each in word:
+	    if each in exceptions:
+		exceptions.remove(each)
+	
+	skills = user_doc.get('skills')
+	rates = self.get_argument('rates')
+	if rates != '':
+	    rates = rates.replace(',', ' ')
+	    rates = rates.split()
+	    print 'rates', rates
+	    for i in range(0, len(languages)):
+		if str(rates[i]) != str(0):
+		    r = str(rates[i]).split('-')
+		    print r[0], r[1], 'hi'
+		    skills[r[1]] = r[0]
+		    print skills
+		    
+	    
+	print 'SKILLS', skills
 	recs = []	
 	old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
 	count = 0
@@ -167,23 +185,24 @@ class AccountPageHandler(BaseHandler):
 	    recs.append([w, old_recs[w]])	
 
 	input0 = self.get_argument('bad_lang0')
-	if input0 not in exceptions:
+	if input0 not in exceptions and input0 != '':
 	    exceptions.append(input0)	
 	try:
 	    input1 = self.get_argument('bad_lang1')
-	    if input1 and input1 not in exceptions:
+	    if input1 and input1 not in exceptions and input1 != '':
 		exceptions.append(input1)	    
 	    try:
 		input2 = self.get_argument('bad_lang2')
-		if input2 and input2 not in exceptions:
+		if input2 and input2 not in exceptions and input2 != '':
 		    exceptions.append(input2)
 	    except:
 		print 'nope'
 	except:
 	    print 'nope'
-		    
-	#self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = 'Danielle', new = False)
 	
+	coll.update({'name': user}, {'$set': {'exceptions': exceptions, 'skills': skills}})
+
+	self.redirect('/account/')
 
 
 
