@@ -13,7 +13,7 @@ import pymongo
 import collections
 define("port", default=8888, help="run on the given port", type=int)
 
-from handlers.handlers import * 
+from handlers.handlers import *
 
 class Application(tornado.web.Application):
     def __init__(self, **overrides):
@@ -27,7 +27,7 @@ class Application(tornado.web.Application):
             url(r'/definitions/', DefPageHandler, name = 'definitions'),
             url(r'/result/', ResultPageHandler, name = 'result')
 	]
-	
+
         settings = {
             "template_path":Settings.TEMPLATE_PATH,
             "static_path":Settings.STATIC_PATH,
@@ -35,12 +35,16 @@ class Application(tornado.web.Application):
             "cookie_secret": Settings.COOKIE_SECRET,
             "login_url": "/auth/login/"
         }
-        conn = pymongo.MongoClient("localhost", 27017)
+        conn = pymongo.MongoClient("localhost", 12321)
         self.db= conn['jjaguar_database']
         coll = self.db['auth_users']
+<<<<<<< Updated upstream
         
+=======
+
+>>>>>>> Stashed changes
         tornado.web.Application.__init__(self, handlers, **settings)
-                
+
 if __name__ == "__main__":
     tornado.options.parse_command_line()
     http_server = tornado.httpserver.HTTPServer(Application())

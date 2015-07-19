@@ -6,7 +6,7 @@ def a (x):
     print str(x)
 
 def give_rating(profile, lang_to_rate):
-    return sum([float(sum([lang_to_rate[key] != other[key] for key, val in lang_to_rate.iteritems() if key not in ["name", "description"]])) #List of booleans corresponding to differences
+    return sum([float(sum([lang_to_rate.get(key) != other.get(key) for key, val in lang_to_rate.iteritems() if key not in ["name", "description"]])) #List of booleans corresponding to differences
                 * profile["skills"][other["name"]] #Weight rating by amount of usage of each language.
                 / sum([rating for name, rating in profile["skills"].iteritems()]) # sum of ratings for average
                 / len(lang_to_rate.keys()) # number of elements
@@ -18,7 +18,7 @@ def give_rating(profile, lang_to_rate):
 def give_recommendations (profile, constraints={}):
     possible_langs = [lang for name, lang in descriptions.evaluated_languages.iteritems()
                       if (name not in profile["exceptions"]
-                          and False not in [lang[key] == val for key, val in constraints.iteritems()])]
+                          and False not in [lang.get(key) == val for key, val in constraints.iteritems()])]
     return {lang["name"] : give_rating(profile, lang) for lang in possible_langs}
 
 
