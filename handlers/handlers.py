@@ -15,6 +15,8 @@ import threading
 from tornado.ioloop import IOLoop
 from tornado.web import asynchronous, RequestHandler, Application
 from tornado.httpclient import AsyncHTTPClient
+import pymongo
+
 
 class BaseHandler(RequestHandler):
     def get_login_url(self):
@@ -82,30 +84,46 @@ class RegisterHandler(AuthLoginHandler):
 class HomePageHandler(BaseHandler):
     def get(self):   
 	doc = {"name": "azheng", "skill": {"python": 7, "c": 3}, "old_recs":{"c": 90, "python": 10}}
-	#old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
 	d = doc['old_recs']
-	print d
 	from collections import OrderedDict
 	from operator import itemgetter
 	d = OrderedDict(sorted(d.items(), key=itemgetter(1)))	
-	print d	
-	print doc
 	self.render('home.html', user= self.get_current_user(), doc = doc, d= d)
 
 class AccountPageHandler(BaseHandler):
     def get(self):
+	conn = pymongo.MongoClient()
+	db = conn['jjaguar_database']
+	coll = db['account_info']
+	user = self.get_current_user()
+	
+	print 'user:', user
+	
         languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
-	old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
-	exceptions = ['clojure', 'c#']
+	
+	user_doc = coll.find_one({'name': user})
+	if user_doc:
+	    old_recs = user_doc.get('old_rec')
+	    exceptions = user_doc.get('exceptions')
+	    skills = user_doc.get('exceptions')
+	else:
+	    user_doc = {
+	        'name': user,
+	        'exceptions': [],
+	        'old_rec': {}
+	    }
+	    old_recs = {}
+	    exceptions = []
 
 	recs = []
 	count = 0
 	for w in sorted(old_recs, key=old_recs.get, reverse=True):
 	    recs.append([w, old_recs[w]])
 	    
-	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = 'Danielle', new = False)
+	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = user, new = False)
 
     def post(self):
+	
 	exceptions = []
 	recs = []	
 	languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
