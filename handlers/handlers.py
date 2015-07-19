@@ -81,7 +81,16 @@ class RegisterHandler(AuthLoginHandler):
 	
 class HomePageHandler(BaseHandler):
     def get(self):   
-        self.render('sidebar.html')
+	doc = {"name": "azheng", "skill": {"python": 7, "c": 3}, "old_recs":{"c": 90, "python": 10}}
+	#old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
+	d = doc['old_recs']
+	print d
+	from collections import OrderedDict
+	from operator import itemgetter
+	d = OrderedDict(sorted(d.items(), key=itemgetter(1)))	
+	print d	
+	print doc
+	self.render('home.html', user="azheng", doc = doc, d= d)
 
 class AccountPageHandler(BaseHandler):
     def get(self):
@@ -128,7 +137,18 @@ class AccountPageHandler(BaseHandler):
 class LearnPageHandler(BaseHandler):
     def get(self):
 	self.render('learn.html')
-    
+    #def post(self):
+	#form = """
+	#<script scr = "/static/js/jquery-1.7.2.min.js"></script>
+	
+	#var boxes = $('input[name = location]:checked');
+	#var boxesValue = [];
+	#$(boxes).each(function(){
+	#boxesValue.push(value);
+	#});
+	#"""
+	#self.write(form)
+	
 class DefPageHandler(BaseHandler):
     def get(self):
 	form = """<h3>Here are a few terms to understand before we recommend a dictionary:</h3>

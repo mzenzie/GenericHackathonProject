@@ -9,6 +9,8 @@ import Settings
 import tornado.escape
 from decorator import protected
 from tornado.web import url
+import pymongo
+import collections
 define("port", default=8888, help="run on the given port", type=int)
 
 from handlers.handlers import * 
@@ -32,6 +34,9 @@ class Application(tornado.web.Application):
             "cookie_secret": Settings.COOKIE_SECRET,
             "login_url": "/auth/login/"
         }
+        conn = pymongo.MongoClient("localhost", 27017)
+        self.db= conn['jjaguar_database']
+        
         tornado.web.Application.__init__(self, handlers, **settings)
                 
 if __name__ == "__main__":
