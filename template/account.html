@@ -18,7 +18,7 @@
 		}
 		else {
 		    var newdiv = document.createElement('div');
-		    newdiv.innerHTML =  "<input type='text' name='myInputs" + counter + "'>";
+		    newdiv.innerHTML =  "<input type='text' name='bad_lang" + counter + "'>";
 		    document.getElementById(divName).appendChild(newdiv);
 		    counter++;
 		}
@@ -106,8 +106,8 @@
 		    </div><!--container-->
 		    
 		    <div>
-
-			{% if not new %}
+			<p name = 'hiding' id = 'hiding'></p>
+    			{% if not new %}
 			    <p><b>Your most recent recommendations for a new Programming Language were:</b></p>
 			    <div class="container">
 			        {% for i in range(0, len(old_recs)) %}
@@ -129,15 +129,14 @@
 				var val
 				$("ul").on("click", "button", function(e) {
 				    e.preventDefault();
+				    prev_val = document.getElementById('hiding').innerHTML
 				    val = $(this).parent()
-				    document.getElementById('hiding').innerHTML = this.value;
+				    document.getElementById('hiding').innerHTML = prev_val + ' ' + this.value;
 				    $(this).parent().remove();
 				});
 				
 				</script>
 			    </div>
-			    
-			    <p name = 'hiding' id = 'hiding'></p>
 
 			{% end %}
 
@@ -147,7 +146,7 @@
 			<p>Add any languages that you do no have interest in:</p>
 			<form method="POST" class="input" action="/account/">
 			    <div id="dynamicInput">
-				<input type="text" name="myInputs0" required>
+				<input type="text" name="bad_lang0" required>
 			    </div>
 			    <input class = 'submit' type="submit" value="Submit">
 

@@ -111,4 +111,16 @@
 
 }
 
+ul {
+  list-style-type: None;
+}
 
+#x {
+  color: red;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+/*  display: none;
+}*/

@@ -85,14 +85,46 @@ class HomePageHandler(BaseHandler):
 
 class AccountPageHandler(BaseHandler):
     def get(self):
-        languages = ['python', 'java', 'javascript', 'c']
+        languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
 	old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
-	from collections import OrderedDict
-	from operator import itemgetter
-	d = OrderedDict(sorted(old_recs.items(), key=itemgetter(1)))	
-	print d
-	self.render('account.html', languages = languages, old_recs = old_recs, user = 'Danielle')
+	exceptions = ['clojure', 'c#']
 
+	recs = []
+	count = 0
+	for w in sorted(old_recs, key=old_recs.get, reverse=True):
+	    recs.append([w, old_recs[w]])
+	    
+	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = 'Danielle', new = False)
+
+    def post(self):
+	exceptions = []
+	
+	input0 = self.get_argument('bad_lang0')
+	if input0 not in exceptions:
+	    exceptions.append(input0)	
+	try:
+	    input1 = self.get_argument('bad_lang1')
+	    if input1 and input1 not in exceptions:
+		exceptions.append(input1)	    
+	    try:
+		input2 = self.get_argument('bad_lang2')
+		if input2 and input2 not in exceptions:
+		    exceptions.append(input2)
+	    except:
+		print 'nope'
+	except:
+	    print 'nope'
+	    
+	import BeautifulSoup
+	soup = BeautifulSoup.BeautifulSoup(outer_html)
+	inner_html = soup.find('hiding')
+	print inner_html.prettify()	
+	
+	
+	#removed_vals = self.get_argument('hiding')
+	#remove_from_exception = removed_vals.get_attribute('innerHTML')
+	#print "hidden", remove_from_exception
+	
 class LearnPageHandler(BaseHandler):
     def get(self):
 	self.render('learn.html')
