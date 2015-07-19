@@ -67,7 +67,6 @@ class RegisterHandler(AuthLoginHandler):
         username = self.get_argument("username", "")
         names = list(self.application.db['auth_users'].find())
         for each in names:
-            print each
             try:
                 if each[username]:
                     error_msg = u"?error=" + tornado.escape.url_escape("Login name already taken")
@@ -78,7 +77,6 @@ class RegisterHandler(AuthLoginHandler):
         user = {}
         user[username] = password
         self.application.db['auth_users'].insert_one(user)
-        print list(self.application.db['auth_users'].find())
         self.set_current_user(username)
         self.redirect('/home/')
 
@@ -92,21 +90,11 @@ class HomePageHandler(BaseHandler):
     def get(self):   
 	doc = {"name": "azheng", "skill": {"python": 7, "c": 3}, "old_recs":{"c": 90, "python": 10}}
 	d = doc['old_recs']
-	from collections import OrderedDict
-	from operator import itemgetter
-	d = OrderedDict(sorted(d.items(), key=itemgetter(1)))	
+
 	self.render('home.html', user= self.get_current_user(), doc = doc, d= d)
 	recs = []
 	for w in sorted(d, key=d.get, reverse=True):
 	    recs.append([w, d[w]])
-	
-	
-	#print d
-	#from collections import OrderedDict
-	#from operator import itemgetter
-	#d = OrderedDict(sorted(d.items(), key=itemgetter(1)))	
-	#print d	
-	#print doc
 	self.render('home.html', user= self.get_current_user(), doc = doc, d= recs)
 
 
@@ -193,7 +181,7 @@ class LearnPageHandler(BaseHandler):
 class ResultPageHandler(BaseHandler):
     @protected
     def get(self):
-	self.render('sidebar.html')
+	self.render('result.html',self.get_current_user())
     def post(self):
 	constraints = {}
 	id_type = self.get_argument('type')
@@ -224,14 +212,6 @@ class ResultPageHandler(BaseHandler):
 class DefPageHandler(BaseHandler):
     @protected
     def get(self):
-	
-	form = """<h3>Here are a few terms to understand before we recommend a dictionary:</h3>
-		<p>Imperative - focuses on describing how a program operates, defines sequences of commands for the computer to perform</p>
-		<p>Declarative - describes what the program should accomplish, rather than describing how to go about accomplishing it as a sequence of the commands </p>
-		<p>Static Typing - the type of a variable is known at compile time, the user must declare the type of each variable</p>
-		<p>Dynamic Typing - allows you to provide type information, but do not require it</p>
-		<p>Compiled language - </p>
-		<p>Interpreted language- most of its implementations execute instructions directly, without previously compiling a program into machine-language instructions</p>
-		<p>Functional - functions, not objects or procedures, are used as the fundamental building blocks of a program</p></h3>"""
-	self.write(form)
-	
+	doc = {"name": "azheng", "skill": {"python": 7, "c": 3}, "old_recs":{"c": 90, "python": 10}}
+	d = doc['old_recs']	
+	self.render('definition.html', user = self.get_current_user(),  d = d)
