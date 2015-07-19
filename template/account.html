@@ -24,10 +24,12 @@
 		}
 	    }
 	</script>
-	
+
 	<script>
-	    function outputUpdate(vol, count) {
-		document.querySelector('#rate-' + count).value = vol;
+	    var arr = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	    function outputUpdate(vol, count, slide_name) {
+		arr[count] = vol + '-' + slide_name
+		document.getElementById('rates').value = arr;
 	    }
 	</script>
 	
@@ -61,11 +63,6 @@
                        <span class="fa fa-user solo">Definitions</span>
                    </a>
                </li>
-	       <li >
-		    <a href= "/auth/logout/" data-scroll>
-			<span class = 'fa fa-user solo'> Log out {{user}}</span>
-		    </a>
-	       </li>
            </ul>
        </nav>
    </div>
@@ -75,6 +72,9 @@
         <div class="page-content inset" data-spy="scroll" data-target="#spy">
             <div class="row">
                 <div class="jumbotron text-center" >
+		    <form method="POST" class="input" action="/account/">
+		    <fieldset>
+
 		    <header><h3><b>Username: {{ user }} <b/></h3></header>
 		    <p>Here you can view all of your account information<p>
 		    <br/>
@@ -85,12 +85,11 @@
 				{% for i in range(0, len(languages)) %}
 				    <tr>
 					<td>
-					    <p id = "language">{{ languages[i] }}</p>
+					    <p id = "language">{{ str(languages[i][0]) }}</p>
 					</td>
 					<td>
-					    <input type="range" min = 0 max = 10 value = 0 step = 1 id = "slider" oninput = "outputUpdate(value, {{str(i)}})" list = "volsettings">
+					    <input type="range" min = 1 max = 10 value = {{ str(languages[i][1]) }} step = 1 id = "slider" oninput = "outputUpdate(value, {{str(i)}}, '{{languages[i][0]}}' )" list = "volsettings">
 					    <datalist id = "volsettings">
-						<option>0</option>
 						<option>1</option>
 						<option>2</option>
 						<option>3</option>
@@ -102,7 +101,6 @@
 						<option>9</option>
 						<option>10</option>
 					    </datalist>
-					    <output id="{{ 'rate-' + str(i) }}">0</output>
 					</td>
 				    </tr> 
 				{% end %}
@@ -116,7 +114,7 @@
 			    <p><b>Your most recent recommendations for a new Programming Language were:</b></p>
 			    <div class="container">
 			        {% for i in range(0, len(old_recs)) %}
-				    <p><b>{{ old_recs[i][0].upper() }}</b> with a relevance of <b>{{ old_recs[i][1]*100 }}%</b> to your given criteria </p>
+				    <p><b>{{ old_recs[i][0].upper() }}</b> with a relevance of <b>{{ round(old_recs[i][1]*100, 2) }}%</b> to your given criteria </p>
 			        {% end %}
 			    </div>
 		    
@@ -134,35 +132,30 @@
 				var val
 				$("ul").on("click", "button", function(e) {
 				    e.preventDefault();
-				    prev_val = document.getElementById('hiding').innerHTML
+				    prev_val = document.getElementById('hiding').value
 				    val = $(this).parent()
-				    document.getElementById('hiding').innerHTML = prev_val + ' ' + this.value;
+				    document.getElementById('hiding').value = prev_val + ' ' + this.value;
 				    $(this).parent().remove();
 				});
 				
 				</script>
 			    </div>
 			    
-			    <p name = 'hiding' id = 'hiding'></p>
 
 			{% end %}
 
 		    </div>
 		    
-		    <div>
 			<p>Add any languages that you do no have interest in:</p>
-			<form method="POST" class="input" action="/account/">
-			    <div id="dynamicInput">
-				<input type="text" name="bad_lang0" required>
-			    </div>
-			    <input class = 'submit' type="submit" value="Submit">
-
-			    <input class ='add_input' type="button" value="Add another text input" onClick="addInput('dynamicInput');">
-			</form>
-		    </div>
-		    
-		    <br/>
-		    <br/>
+			<div id="dynamicInput">
+			    <input type="text" name="bad_lang0">
+			</div>
+			<input type = "hidden" id = 'hiding' name = 'hiding'>
+			<input type = "hidden" id = 'rates' name = 'rates' value = ''>
+			<input class = 'submit' type="submit" value="Submit">
+			<input class ='add_input' type="button" value="Add another text input" onClick="addInput('dynamicInput');">
+		    </fieldset>
+		    </form>
 		</div><!--jumbotron-->
 	    </div><!--row-->
 	</div><!--page content-->

@@ -39,7 +39,7 @@
                </li>
 	       <li >
 		    <a href= "/auth/logout/" data-scroll>
-			<span class = 'fa fa-user solo'> Log out {{user}}</span>
+			<span class = 'fa fa-user solo'> Logout {{user}}</span>
 		    </a>
 	       </li>
            </ul>
@@ -51,16 +51,16 @@
             <div class="row">
                 <div class="jumbotron text-center" >
 		    <h1> Welcome, {{user}} </h1>
-		    <p> If you interested in learning a new language or start on a new project but don't know where to start, then you can tell us what you know and we will give you a direction.</p> 
+		    <p> If you are interested in learning a new language or starting on a new project but don't know where to begin, then tell us what languages you currently know, and we will automatically recommend you a new language to use.</p> 
 		    <!--doc = coll.find_one({'name': username})-->
-		    {% if not 'old_recs' in doc %}
+		    {% if doc == None %}
 			<p> Tell us a little about yourself </p>
-			<a href = "/account/"> <button> Add information about me </button></a> <br>
+			<a href = "/account/"> <button> Add Information About Me </button></a> <br>
 		
 		    {% else %}
 			<h3> Your most recent recommendations for a new programming language were: <br> </h3>
-			{% for key, value in d.iteritems() %}
-			    <p><b> {{key}} </b> with a relevance of <b> {{value*100 }} % </b> to your given critieria </p>
+			{% for i in range(0 ,len(d)) %}
+			    <p><b> {{d[i][0].upper()}} </b> with a relevance of <b> {{round(d[i][1]*100, 2) }} % </b> to your given critieria </p>
 			
 			   
 			{%end%}

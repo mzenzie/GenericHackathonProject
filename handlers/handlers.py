@@ -17,6 +17,10 @@ from tornado.ioloop import IOLoop
 from tornado.web import asynchronous, RequestHandler, Application
 from tornado.httpclient import AsyncHTTPClient
 import pymongo
+from recommend import give_recommendations
+import sys
+sys.path.append('../')
+import descriptions
 
 
 class BaseHandler(RequestHandler):
@@ -44,7 +48,7 @@ class AuthLoginHandler(BaseHandler):
             self.set_current_user(username)
             self.redirect('/home/')
         else:
-            self.redirect(u'/auth/login/')
+            self.redirect(u'/register/')
         
 
     def set_current_user(self, user):
@@ -87,87 +91,143 @@ class MainPageHandler(BaseHandler):
 	
 class HomePageHandler(BaseHandler):
     @protected
-    def get(self):   
-	doc = {"name": "azheng", "skill": {"python": 7, "c": 3}, "old_recs":{"c": 90, "python": 10}}
-	d = doc['old_recs']
-
-	self.render('home.html', user= self.get_current_user(), doc = doc, d= d)
-	recs = []
-	for w in sorted(d, key=d.get, reverse=True):
-	    recs.append([w, d[w]])
+    def get(self):  
+	recs = []	
+	conn = pymongo.MongoClient()
+	db = conn['jjaguar_database']
+	coll = db['account_info']
+	print list(coll.find())
+	
+	doc = coll.find_one({'name': self.get_current_user()})
+	
+	print doc 
+	
+	if doc:
+	    d = doc.get('old_rec')
+	
+	    for w in sorted(d, key=d.get, reverse=True):
+		recs.append([w, d[w]])
+	else:
+	    d = {}
+		
+		
 	self.render('home.html', user= self.get_current_user(), doc = doc, d= recs)
 
 
 class AccountPageHandler(BaseHandler):
-    @protected
     def get(self):
 	conn = pymongo.MongoClient()
 	db = conn['jjaguar_database']
 	coll = db['account_info']
 	user = self.get_current_user()
+	old_recs = {}
+	exceptions = []
+	skills = []
+	new = True
 	
-	print 'user:', user
-	
-        languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
-	
+        languages = []
+	skills = {}
+        for each in descriptions.evaluated_languages:
+	    skills[each] = 0
+	    languages.append(each)
+	    
 	user_doc = coll.find_one({'name': user})
 	if user_doc:
 	    old_recs = user_doc.get('old_rec')
 	    exceptions = user_doc.get('exceptions')
-	    skills = user_doc.get('exceptions')
+	    skills = user_doc.get('skills')
+	    new = False
+	    
 	else:
 	    user_doc = {
 	        'name': user,
 	        'exceptions': [],
-	        'old_rec': {}
+	        'old_rec': {},
+	        'skills': skills
 	    }
 	    old_recs = {}
 	    exceptions = []
+	    coll.insert(user_doc)
+	    new = True
 
-        languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
- 	old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
-	
-	exceptions = ['clojure', 'c#']
-
-
+	new_langs = []
+	for each in skills:
+	    new_langs.append([each, skills[each]])
+	                     
 	recs = []
 	count = 0
+	print '!!!!!!!!!!!!!!!', old_recs
 	for w in sorted(old_recs, key=old_recs.get, reverse=True):
 	    recs.append([w, old_recs[w]])
-	    
-	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = user, new = False)
-
-    def post(self):
 	
-	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = self.get_current_user(), new = False)
-
+	self.render('account.html', languages = new_langs, exceptions = exceptions, old_recs = recs, user = user, new = new)
+	
     def post(self):
+	conn = pymongo.MongoClient()
+	db = conn['jjaguar_database']
+	coll = db['account_info']
+	user = self.get_current_user()	
+	
+	languages = []
+	
+	skills = {}
+	for each in descriptions.evaluated_languages:
+	    skills[each] = 1
+	    languages.append(each)
+	    
+	new_langs = []
+	for each in skills:
+	    new_langs.append([each, skills[each]])    
 
-	exceptions = []
+	user_doc = coll.find_one({'name': user})
+	exceptions = user_doc['exceptions']
+	word = self.get_argument('hiding').split()
+	for each in word:
+	    if each in exceptions:
+		exceptions.remove(each)
+	
+	skills = user_doc.get('skills')
+	rates = self.get_argument('rates')
+	if rates != '':
+	    rates = rates.replace(',', ' ')
+	    rates = rates.split()
+	    print 'rates', rates
+	    for i in range(0, len(languages)):
+		if str(rates[i]) != str(0):
+		    r = str(rates[i]).split('-')
+		    print r[0], r[1], 'hi'
+		    skills[r[1]] = r[0]
+		    print skills
+		    
+	    
+	print 'SKILLS', skills
 	recs = []	
-	languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
-	old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
+	old_recs =  user_doc['old_rec']
+	print old_recs
+	
 	count = 0
 	for w in sorted(old_recs, key=old_recs.get, reverse=True):
 	    recs.append([w, old_recs[w]])	
 
 	input0 = self.get_argument('bad_lang0')
-	if input0 not in exceptions:
+	if input0 not in exceptions and input0 != '':
 	    exceptions.append(input0)	
 	try:
 	    input1 = self.get_argument('bad_lang1')
-	    if input1 and input1 not in exceptions:
+	    if input1 and input1 not in exceptions and input1 != '':
 		exceptions.append(input1)	    
 	    try:
 		input2 = self.get_argument('bad_lang2')
-		if input2 and input2 not in exceptions:
+		if input2 and input2 not in exceptions and input2 != '':
 		    exceptions.append(input2)
 	    except:
 		print 'nope'
 	except:
 	    print 'nope'
-		    
-	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = 'Danielle', new = False)
+	
+	coll.update({'name': user}, {'$set': {'exceptions': exceptions, 'skills': skills}})
+
+	self.redirect('/account/')
 
 	
 
@@ -177,36 +237,69 @@ class LearnPageHandler(BaseHandler):
 	self.render('learn.html', user = self.get_current_user())
 
     def post(self):
-	self.redirect('/result/')
+	#self.redirect('/result/')
+	constraints = {}
+	id_type = self.get_argument('type')
+	process = self.get_argument('process')
+	functional = self.get_argument('Functional')
+	VM = self.get_argument("VM")
+	Usage1 = self.get_argument("Usage_1")
+	Usage2 = self.get_argument("Usage_2")
+	Usage3 = self.get_argument("Usage_3")
+	typing = self.get_argument('typing')
+	
+	# self.write('You chose {}, {}, {}, {}'.format(id_type, process, functional, typing))
+	if id_type == 'Imperative':
+	    constraints['imperative'] = 'y'
+	elif id_type == "Declarative":
+	    
+	    constraints['imperative'] = 'n'
+	    
+	if process == 'Compiled':
+	    constraints['compiled'] = 'y'
+	elif process == "Interpreted":
+	    
+	    constraints['compiled'] = 'n'
+	    
+	if functional == 'Functional':
+	    constraints['functional'] = 'y'
+	
+	    
+	if typing == "Dynamic":
+	    constraints['typing'] = 'd'
+	elif typing == "Static":
+	    constraints['typing'] = 's'
+	    
+	if VM == "JVM":
+	    constraints['vm'] = 'jvm'
+	elif VM == "SQVM":
+	    constraints['vm'] = "squeakvm"
+	
+	if Usage2 == 'MobileApp':
+	    constraints['phone'] = 'y'
+	if Usage1 == "Game":
+	    constraints['game'] = 'y'
+	if Usage3 == 'UtilityScripts':
+	    constraints['utility'] = 'y'
+	
+	conn = pymongo.MongoClient()
+	db = conn['jjaguar_database']
+	coll = db['account_info']
+	profile = coll.find_one({'name': self.get_current_user()})
+
+	result = give_recommendations(profile, constraints)
+	final = []
+	for w in sorted(result, key=result.get, reverse=True):
+	    final.append([w, result[w]])
+	coll.update({'name': self.get_current_user()}, {'$set': {'old_rec': result}})
+	self.render('result.html', user = self.get_current_user(), result = final)
+	
 class ResultPageHandler(BaseHandler):
     @protected
     def get(self):
 	self.render('result.html',self.get_current_user())
     def post(self):
 	constraints = {}
-	id_type = self.get_argument('type')
-	process = self.get_argument('process')
-	functional = self.get_argument('Functional')
-	typing = self.get_argument('typing')
-	self.write('You chose {}, {}, {}, {}'.format(id_type, process, functional, typing))
-	if id_type == 'imperative':
-	    constraints['imperative'] = 'y'
-	else:
-	    constraints['imperative'] = 'n'
-	if process == 'compiled':
-	    constraints['compiled'] = 'y'
-	else:
-	    constraints['compiled'] = 'n'
-	if functional == 'functional':
-	    constraints['functional'] = 'y'
-	else:
-	    constraints['functional'] = 'n'
-	if typing == "dynamic":
-	    constraints['typing'] = 'd'
-	else:
-	    constraints['typing'] = 's'
-	self.write('\n')
-	self.write(constraints)
 
 	
 class DefPageHandler(BaseHandler):
