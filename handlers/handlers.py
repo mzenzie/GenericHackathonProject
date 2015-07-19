@@ -111,13 +111,34 @@ class LearnPageHandler(BaseHandler):
 	
 	self.redirect('/result/')
 class ResultPageHandler(BaseHandler):
+    def get(self):
+	self.render('sidebar.html')
     def post(self):
+	constraints = {}
 	id_type = self.get_argument('type')
 	process = self.get_argument('process')
 	functional = self.get_argument('Functional')
 	typing = self.get_argument('typing')
 	self.write('You chose {}, {}, {}, {}'.format(id_type, process, functional, typing))
-	
+	if id_type == 'imperative':
+	    constraints['imperative'] = 'y'
+	else:
+	    constraints['imperative'] = 'n'
+	if process == 'compiled':
+	    constraints['compiled'] = 'y'
+	else:
+	    constraints['compiled'] = 'n'
+	if functional == 'functional':
+	    constraints['functional'] = 'y'
+	else:
+	    constraints['functional'] = 'n'
+	if typing == "dynamic":
+	    constraints['typing'] = 'd'
+	else:
+	    constraints['typing'] = 's'
+	self.write('\n')
+	self.write(constraints)
+
 	
 class DefPageHandler(BaseHandler):
     def get(self):
