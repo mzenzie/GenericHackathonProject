@@ -15,6 +15,7 @@ import threading
 from tornado.ioloop import IOLoop
 from tornado.web import asynchronous, RequestHandler, Application
 from tornado.httpclient import AsyncHTTPClient
+import pymongo
 
 class BaseHandler(RequestHandler):
     def get_login_url(self):
@@ -94,7 +95,13 @@ class HomePageHandler(BaseHandler):
 
 class AccountPageHandler(BaseHandler):
     def get(self):
-        languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
+	conn = pymongo.MongoClient()
+	db = conn['jjaguar_database']
+	coll = db['account_info']
+	curr_user = self.get_current_user()
+	
+	user_info = coll.find_one({'name': get_current_user()})
+	
 	old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
 	exceptions = ['clojure', 'c#']
 
@@ -106,6 +113,10 @@ class AccountPageHandler(BaseHandler):
 	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = 'Danielle', new = False)
 
     def post(self):
+	conn = pymongo.MongoClient()
+	db = conn['jjaguar_database']
+	coll = db['account_info']
+	
 	exceptions = []
 	
 	input0 = self.get_argument('bad_lang0')
@@ -123,16 +134,10 @@ class AccountPageHandler(BaseHandler):
 		print 'nope'
 	except:
 	    print 'nope'
-	    
-	import BeautifulSoup
-	soup = BeautifulSoup.BeautifulSoup(outer_html)
-	inner_html = soup.find('hiding')
-	print inner_html.prettify()	
 	
-	
-	#removed_vals = self.get_argument('hiding')
-	#remove_from_exception = removed_vals.get_attribute('innerHTML')
-	#print "hidden", remove_from_exception
+	print exceptions
+	#removed = self.get_argument('rem_vals')
+	#print removed
 	
 class LearnPageHandler(BaseHandler):
     def get(self):

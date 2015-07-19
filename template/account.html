@@ -106,7 +106,7 @@
 		    </div><!--container-->
 		    
 		    <div>
-			<p name = 'hiding' id = 'hiding'></p>
+			<div name = 'rem_vals' id = 'rem_vals'></div>
     			{% if not new %}
 			    <p><b>Your most recent recommendations for a new Programming Language were:</b></p>
 			    <div class="container">
@@ -129,9 +129,9 @@
 				var val
 				$("ul").on("click", "button", function(e) {
 				    e.preventDefault();
-				    prev_val = document.getElementById('hiding').innerHTML
+				    prev_val = document.getElementById('rem_vals').textContent
 				    val = $(this).parent()
-				    document.getElementById('hiding').innerHTML = prev_val + ' ' + this.value;
+				    document.getElementById('rem_vals').textContent = prev_val + ' ' + this.value;
 				    $(this).parent().remove();
 				});
 				

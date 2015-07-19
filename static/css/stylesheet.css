@@ -30,8 +30,8 @@
   width: 100%;
 }
 
-.jumbotron {
-  height: 10000px;   
+.container {
+  border: 1px;
 }
 .sidebar-nav {
   position: absolute;

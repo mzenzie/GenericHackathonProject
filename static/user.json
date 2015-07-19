@@ -1,0 +1,14 @@
+{
+    "name": "dzelin",
+    "skills": {
+	"python": 7,
+	"java": 2,
+	"clojure": 0,
+	"javascript": 0
+    }
+    "exceptions": ["clojure", "c#"],
+    "old_rec": {
+	"c": 0.90,
+	"python": 0.40,
+    }
+}
