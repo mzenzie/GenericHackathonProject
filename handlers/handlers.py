@@ -16,7 +16,9 @@ from tornado.ioloop import IOLoop
 from tornado.web import asynchronous, RequestHandler, Application
 from tornado.httpclient import AsyncHTTPClient
 import pymongo
-
+import sys
+sys.path.append('../')
+import descriptions
 
 class BaseHandler(RequestHandler):
     def get_login_url(self):
@@ -96,37 +98,69 @@ class AccountPageHandler(BaseHandler):
 	db = conn['jjaguar_database']
 	coll = db['account_info']
 	user = self.get_current_user()
+	old_recs = []
+	exceptions = []
+	skills = []
+	new = True
 	
-	print 'user:', user
-	
-        languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
-	
+        languages = []
+	skills = {}
+        for each in descriptions.evaluated_languages:
+	    skills[each] = 0
+	    languages.append(each)
+	    
 	user_doc = coll.find_one({'name': user})
 	if user_doc:
 	    old_recs = user_doc.get('old_rec')
 	    exceptions = user_doc.get('exceptions')
-	    skills = user_doc.get('exceptions')
+	    skills = user_doc.get('skills')
+	    new = False
 	else:
 	    user_doc = {
 	        'name': user,
 	        'exceptions': [],
-	        'old_rec': {}
+	        'old_rec': {},
+	        'skills': skills
 	    }
 	    old_recs = {}
 	    exceptions = []
+	    coll.insert(user_doc)
+	    new = True
 
+	new_langs = []
+	for each in skills:
+	    new_langs.append([each, skills[each]])
+	                     
 	recs = []
 	count = 0
 	for w in sorted(old_recs, key=old_recs.get, reverse=True):
 	    recs.append([w, old_recs[w]])
-	    
-	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = user, new = False)
+	
+	self.render('account.html', languages = new_langs, exceptions = exceptions, old_recs = recs, user = user, new = new, skills = skills)
 
     def post(self):
+	conn = pymongo.MongoClient()
+	db = conn['jjaguar_database']
+	coll = db['account_info']
+	user = self.get_current_user()	
 	
+	print 'here'
+    
+	languages = []
+	for each in descriptions.evaluated_languages:
+	    languages.append(each)
+	
+	ratings = {}
+	for i in range(0, len(languages)):
+	    try:
+		print self.get_argument('rate-' + str(i)), 'hi'
+	    except:
+		print 'no rates'
+		break
+	    	
+
 	exceptions = []
 	recs = []	
-	languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
 	old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
 	count = 0
 	for w in sorted(old_recs, key=old_recs.get, reverse=True):
@@ -148,7 +182,7 @@ class AccountPageHandler(BaseHandler):
 	except:
 	    print 'nope'
 		    
-	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = 'Danielle', new = False)
+	#self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = 'Danielle', new = False)
 	
 
 
