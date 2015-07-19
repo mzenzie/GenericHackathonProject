@@ -90,7 +90,7 @@ class HomePageHandler(BaseHandler):
 	d = OrderedDict(sorted(d.items(), key=itemgetter(1)))	
 	print d	
 	print doc
-	self.render('home.html', user="azheng", doc = doc, d= d)
+	self.render('home.html', user= self.get_current_user(), doc = doc, d= d)
 
 class AccountPageHandler(BaseHandler):
     def get(self):

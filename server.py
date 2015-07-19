@@ -36,6 +36,7 @@ class Application(tornado.web.Application):
         }
         conn = pymongo.MongoClient("localhost", 27017)
         self.db= conn['jjaguar_database']
+        coll = self.db['auth_users']
         
         tornado.web.Application.__init__(self, handlers, **settings)
                 
