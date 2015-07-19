@@ -18,6 +18,7 @@ from handlers.handlers import *
 class Application(tornado.web.Application):
     def __init__(self, **overrides):
         handlers = [
+            url(r'/', MainPageHandler),
             url(r'/auth/login/',AuthLoginHandler),
             url(r'/auth/logout/', AuthLogoutHandler),
             url(r'/register/', RegisterHandler),
@@ -35,14 +36,9 @@ class Application(tornado.web.Application):
             "cookie_secret": Settings.COOKIE_SECRET,
             "login_url": "/auth/login/"
         }
-        conn = pymongo.MongoClient("localhost", 12321)
+        conn = pymongo.MongoClient("localhost", 27017)
         self.db= conn['jjaguar_database']
         coll = self.db['auth_users']
-<<<<<<< Updated upstream
-        
-=======
-
->>>>>>> Stashed changes
         tornado.web.Application.__init__(self, handlers, **settings)
 
 if __name__ == "__main__":

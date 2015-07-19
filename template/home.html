@@ -37,6 +37,11 @@
                        <span class="fa fa-user solo">Definitions</span>
                    </a>
                </li>
+	       <li >
+		    <a href= "/auth/logout/" data-scroll>
+			<span class = 'fa fa-user solo'> Log out {{user}}</span>
+		    </a>
+	       </li>
            </ul>
        </nav>
    </div>
@@ -46,20 +51,21 @@
             <div class="row">
                 <div class="jumbotron text-center" >
 		    <h1> Welcome, {{user}} </h1>
-		    <h3> If you interested in learning a new language or start on a new project but don't know where to start, then you can tell us what you know and we will give you a direction.</h3> 
+		    <p> If you interested in learning a new language or start on a new project but don't know where to start, then you can tell us what you know and we will give you a direction.</p> 
 		    <!--doc = coll.find_one({'name': username})-->
 		    {% if not 'old_recs' in doc %}
 			<p> Tell us a little about yourself </p>
 			<a href = "/account/"> <button> Add information about me </button></a> <br>
 		
 		    {% else %}
-			<h3> Your record shows that you should've learned:
-			{% for every in d %}
-			    <li> {{every}}: {{d[every]}}  </li>
+			<h3> Your most recent recommendations for a new programming language were: <br> </h3>
+			{% for key, value in d.iteritems() %}
+			    <p><b> {{key}} </b> with a relevance of <b> {{value*100 }} % </b> to your given critieria </p>
+			
 			   
 			{%end%}
-			Please update your new profile </h3>
-			<a href = "/account/"> <button> Update </button></a> 
+			<p>Take a few minutes to update your profile &#8594; 
+			<a href = "/account/"> <button> Update </button></a> </p>
 
     		    {%end%}
 		</div>    

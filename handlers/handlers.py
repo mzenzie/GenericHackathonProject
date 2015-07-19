@@ -8,6 +8,7 @@ import tornado.gen
 import tornado.httpserver
 import logging
 import bson.json_util
+from decorator import protected
 import json
 import urlparse
 import time
@@ -80,8 +81,14 @@ class RegisterHandler(AuthLoginHandler):
         print list(self.application.db['auth_users'].find())
         self.set_current_user(username)
         self.redirect('/home/')
+
+class MainPageHandler(BaseHandler):
+    @protected
+    def get(self):  
+	self.redirect('/home/')
 	
 class HomePageHandler(BaseHandler):
+    @protected
     def get(self):   
 	doc = {"name": "azheng", "skill": {"python": 7, "c": 3}, "old_recs":{"c": 90, "python": 10}}
 	d = doc['old_recs']
@@ -89,8 +96,22 @@ class HomePageHandler(BaseHandler):
 	from operator import itemgetter
 	d = OrderedDict(sorted(d.items(), key=itemgetter(1)))	
 	self.render('home.html', user= self.get_current_user(), doc = doc, d= d)
+	recs = []
+	for w in sorted(d, key=d.get, reverse=True):
+	    recs.append([w, d[w]])
+	
+	
+	#print d
+	#from collections import OrderedDict
+	#from operator import itemgetter
+	#d = OrderedDict(sorted(d.items(), key=itemgetter(1)))	
+	#print d	
+	#print doc
+	self.render('home.html', user= self.get_current_user(), doc = doc, d= recs)
+
 
 class AccountPageHandler(BaseHandler):
+    @protected
     def get(self):
 	conn = pymongo.MongoClient()
 	db = conn['jjaguar_database']
@@ -115,6 +136,12 @@ class AccountPageHandler(BaseHandler):
 	    old_recs = {}
 	    exceptions = []
 
+        languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
+ 	old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
+	
+	exceptions = ['clojure', 'c#']
+
+
 	recs = []
 	count = 0
 	for w in sorted(old_recs, key=old_recs.get, reverse=True):
@@ -124,6 +151,10 @@ class AccountPageHandler(BaseHandler):
 
     def post(self):
 	
+	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = self.get_current_user(), new = False)
+
+    def post(self):
+
 	exceptions = []
 	recs = []	
 	languages = ['python', 'java', 'javascript', 'c', 'clojure', 'c#']
@@ -149,19 +180,18 @@ class AccountPageHandler(BaseHandler):
 	    print 'nope'
 		    
 	self.render('account.html', languages = languages, exceptions = exceptions, old_recs = recs, user = 'Danielle', new = False)
+
 	
-
-
 
 class LearnPageHandler(BaseHandler):
+    @protected
     def get(self):
-	self.render('learn.html')
+	self.render('learn.html', user = self.get_current_user())
 
     def post(self):
-	
-	
 	self.redirect('/result/')
 class ResultPageHandler(BaseHandler):
+    @protected
     def get(self):
 	self.render('sidebar.html')
     def post(self):
@@ -192,7 +222,9 @@ class ResultPageHandler(BaseHandler):
 
 	
 class DefPageHandler(BaseHandler):
+    @protected
     def get(self):
+	
 	form = """<h3>Here are a few terms to understand before we recommend a dictionary:</h3>
 		<p>Imperative - focuses on describing how a program operates, defines sequences of commands for the computer to perform</p>
 		<p>Declarative - describes what the program should accomplish, rather than describing how to go about accomplishing it as a sequence of the commands </p>
@@ -202,3 +234,4 @@ class DefPageHandler(BaseHandler):
 		<p>Interpreted language- most of its implementations execute instructions directly, without previously compiling a program into machine-language instructions</p>
 		<p>Functional - functions, not objects or procedures, are used as the fundamental building blocks of a program</p></h3>"""
 	self.write(form)
+	
