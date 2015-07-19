@@ -66,13 +66,19 @@
         <div class="page-content inset" data-spy="scroll" data-target="#spy">
             <div class="row">
                 <div class="jumbotron text-center" >
-		
-		    <p> Select the checkboxes that fits your interests </p> <br>
-		    <input type = "Checkbox" Name = "Declarative" Value = "Declarative"> Declarative <br>
-		    <input type = "Checkbox" Name = "Imperative" Value = "Imperative"> Imperative <br>
-		    <input type = "Checkbox" Name = "Compiled" Value  = "Compiled"> Compiled <br>
-		    <input type = "Checkbox" Name = "Interpreted" Value = "Interpreted"> Interpreted <br>
-		    <input type = "Checkbox" Name = "Functional" Value = "Functional"> Functional <br>
+		    <form method = "post" class = "container", action = "/result/">
+		    <h3> Select the checkboxes that fits your interests </h3> <br>
+		    <p> Do you prefer Declarative or Imperative language? </p>
+		    <input type = "radio" Name = "type" Value = "Declarative"> Declarative <br>
+		    <input type = "radio" Name = "type" Value = "Imperative"> Imperative <br>
+		    <p> Do you like compiled or interpreted langauge better? </p>
+		    <input type = "radio" Name = "process" Value  = "Compiled"> Compiled <br>
+		    <input type = "radio" Name = "process" Value = "Interpreted"> Interpreted <br>
+		    <p> Do you want to play with functional language? </p>
+		    <input type = "radio" Name = "Functional" Value = "Functional"> Functional <br>
+		    <p> Which type do you prefer? </p>
+		    <input type = "radio" Name = "typing" Value = "Dynamic"> Dynamic <br>
+		    <input type = "radio" Name = "typing" Value = "Static"> Static <br>
 		    <!--<input type = "Checkbox" Name = "JVM" Value = "JVM"> JVM <br>-->
 		    <!--<input type = "Checkbox" Name = "SQVM" Value = "SQVM"> SQVM <br>-->
 		    <!--<input type = "Checkbox" Name = "WebApp" Value = "WebApp"> Web App<br>-->
@@ -81,7 +87,8 @@
 		    <!--<input type = "Checkbox" Name = "InfoProcessing" Value ="InfoProcessing"> Info Processing<br>-->
 		    <!--<input type = "Checkbox" Name = "UtilityScripts" Value = "UtilityScripts"> Utility Scripts<br>-->
 		    <br>
-		    <button type ="submit" form = "submit" value= "Submit"> Submit</button>
+		    <input type ="submit"  value= "Submit"> 
+		    </form>
 		</div>    
             </div>
         </div>

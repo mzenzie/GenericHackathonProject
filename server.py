@@ -24,7 +24,8 @@ class Application(tornado.web.Application):
 	    url(r'/home/', HomePageHandler, name='home'),
             url(r'/account/', AccountPageHandler, name = 'account'),
             url(r'/learn/', LearnPageHandler, name = 'learn'),
-            url(r'/definitions/', DefPageHandler, name = 'definitions')
+            url(r'/definitions/', DefPageHandler, name = 'definitions'),
+            url(r'/result/', ResultPageHandler, name = 'result')
 	]
 	
         settings = {

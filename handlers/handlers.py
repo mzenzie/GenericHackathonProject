@@ -105,17 +105,19 @@ class AccountPageHandler(BaseHandler):
 class LearnPageHandler(BaseHandler):
     def get(self):
 	self.render('learn.html')
-    #def post(self):
-	#form = """
-	#<script scr = "/static/js/jquery-1.7.2.min.js"></script>
+
+    def post(self):
 	
-	#var boxes = $('input[name = location]:checked');
-	#var boxesValue = [];
-	#$(boxes).each(function(){
-	#boxesValue.push(value);
-	#});
-	#"""
-	#self.write(form)
+	
+	self.redirect('/result/')
+class ResultPageHandler(BaseHandler):
+    def post(self):
+	id_type = self.get_argument('type')
+	process = self.get_argument('process')
+	functional = self.get_argument('Functional')
+	typing = self.get_argument('typing')
+	self.write('You chose {}, {}, {}, {}'.format(id_type, process, functional, typing))
+	
 	
 class DefPageHandler(BaseHandler):
     def get(self):
