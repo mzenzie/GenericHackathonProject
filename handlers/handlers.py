@@ -2,7 +2,6 @@ import base64
 from bson.objectid import ObjectId
 import os
 import urllib
-
 import tornado.auth
 import tornado.escape
 import tornado.gen
@@ -19,7 +18,7 @@ from tornado.httpclient import AsyncHTTPClient
 
 class BaseHandler(RequestHandler):
     def get_login_url(self):
-        return u"/login"
+        return u"/auth/login/"
 
     def get_current_user(self):
         user_json = self.get_secure_cookie("user")
@@ -31,41 +30,18 @@ class BaseHandler(RequestHandler):
 # Purpose: Login page checks for permission                
 class AuthLoginHandler(BaseHandler):
     def get(self):
-
-        errormessage = ""
-        try:
-            errormesage = self.get_argument("error")
-        except:
-            errormessage = ""
-        self.render ("login.html", errormessage = errormessage)
-        
-    def check_permission(self, password, username):
-        usernames = ["azheng", "dzelin", "mzenzie"]
-        if username in usernames and password == "Welcome1":
-            return True
-        return False
+        self.render ("login.html")
 
     def post(self):  
         username = self.get_argument("username", "")
         password = self.get_argument("password", "")
-        
-        auth = self.check_permission(password, username)
-        if auth:
+        user = self.application.db['auth_users'].find_one({username: password})
+
+        if user:
             self.set_current_user(username)
             self.redirect('/home/')
         else:
-            form = """<form method = "post" class = "container">
-            <p> <form action = "localhost:8888/login/"></form></p>
-            <h3>Incorrect Username or Password. </h3>
-            <p>
-            
-            <form action = "http://localhost:8888/">
-            <input type = "submit" value = "Try again">
-            </form>
-            
-            </p>
-            </form>"""
-            self.write(form)
+            self.redirect(u'/auth/login/')
         
 
     def set_current_user(self, user):
@@ -73,27 +49,54 @@ class AuthLoginHandler(BaseHandler):
             self.set_secure_cookie("user", tornado.escape.json_encode(user))
         else:
             self.clear_cookie("user")
-            
+ 
 # Logout page clears cookie        
 class AuthLogoutHandler(BaseHandler):
     def get(self):
         self.clear_cookie("user")
         self.redirect(self.get_argument("next", "/"))
-        
+
+class RegisterHandler(AuthLoginHandler):
+    def get(self):
+        self.render("register.html")
+    
+    def post(self):
+        username = self.get_argument("username", "")
+        names = list(self.application.db['auth_users'].find())
+        for each in names:
+            print each
+            try:
+                if each[username]:
+                    error_msg = u"?error=" + tornado.escape.url_escape("Login name already taken")
+                    self.redirect(u"/login" + error_msg)   
+            except KeyError: 
+                pass
+        password = self.get_argument('password', '')
+        user = {}
+        user[username] = password
+        self.application.db['auth_users'].insert_one(user)
+        print list(self.application.db['auth_users'].find())
+        self.set_current_user(username)
+        self.redirect('/home/')
+	
 class HomePageHandler(BaseHandler):
     def get(self):   
         self.render('sidebar.html')
 
 class AccountPageHandler(BaseHandler):
     def get(self):
-        languages = ['python', 'java', 'javascript', 'c']	
-	self.render('account.html', languages = languages)
+        languages = ['python', 'java', 'javascript', 'c']
+	old_recs = {'python': 0.40, 'java': 0.90, 'c#': 0.10}
+	from collections import OrderedDict
+	from operator import itemgetter
+	d = OrderedDict(sorted(old_recs.items(), key=itemgetter(1)))	
+	print d
+	self.render('account.html', languages = languages, old_recs = old_recs, user = 'Danielle')
 
 class LearnPageHandler(BaseHandler):
     def get(self):
-	self.write('learn page handler')
+	self.render('learn.html')
     
-
 class DefPageHandler(BaseHandler):
     def get(self):
 	form = """<h3>Here are a few terms to understand before we recommend a dictionary:</h3>

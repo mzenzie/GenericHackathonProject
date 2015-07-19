@@ -18,6 +18,7 @@ class Application(tornado.web.Application):
         handlers = [
             url(r'/auth/login/',AuthLoginHandler),
             url(r'/auth/logout/', AuthLogoutHandler),
+            url(r'/register/', RegisterHandler),
 	    url(r'/home/', HomePageHandler, name='home'),
             url(r'/account/', AccountPageHandler, name = 'account'),
             url(r'/learn/', LearnPageHandler, name = 'learn'),
