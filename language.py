@@ -1,2 +1,0 @@
-class Language(object):
-    self.
